@@ -1,0 +1,74 @@
+---
+title: 'Neighborhood Sports Club'
+date: '2023-07-18'
+tags: ['vue.js', 'vuejs','flask','javascript', 'typescript','python','web development', 'css3', 'posgresql', 'sql', 'html5', 'bootstrap', 'jinja', 'git', 'gitHub', 'w3c', 'responsive', responsiveness']
+---
+
+# Neighborhood Sports Club
+This web application aimed to help a *sports club* to manage its members, its activities, and its finances. 
+It was developed using **Vue.js**, **Flask**, and **PostgreSQL**.
+The project was divided into two main parts: A private app and a public app. As a team, we first developed the private part, 
+in which many API endpoints were exposed for the public app to use. A **PosgreSQL** database was used to store the data.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/depove.png" alt="CDVE public app" />
+
+## Private app
+
+The private app included a login system with roles and permissions, a user management system, and a whole associates management 
+system for the club (being these ones the public app users, and the point of the whole system).
+It was possible to make use of the full CRUD operations on the associates and generate a PDF file with the information of each associate, 
+as an associate ID card.
+
+```python
+# request.form.id
+@payment_api_blueprint.get("/<id>")
+def associate_payments(id):
+    """Gets payments from associate
+    Args:
+        id (int): Associate id
+    Returns:
+        JSON: List of payments for an associate
+    """
+    associate = get_associate_by_id(id)
+    if not associate:
+        return response(404, "No existe el asociado")
+    last_fee = get_last_fee_paid(associate)
+    payment = build_payment(last_fee, associate)
+    payments = list(
+        filter(
+            lambda x: x["deleted"] == False,
+            map(lambda x: x.to_dict(), associate.payments),
+        )
+    )
+    res = {
+        "payments": payments,
+        "name": associate.name,
+        "actual_amount": payment[3],  # amount
+        "surname": associate.surname,
+        "entry_date": associate.entry_date.strftime("%Y-%m-%d %H:%M:%S.%f"),
+    }
+    return response(200, res)
+```
+
+## Public app
+
+The public app was developed using Vue.js, receiving the information from the private app through the exposed API endpoints. It was possible to send the payment 
+receipts to the Club under a user ID, and also to see what activities the Club offered, and some statistics about the Club evolution, related to its associates.
+
+```typescript
+import axios from './axios'
+import { PaymentResponse } from '../interfaces/responses/PaymentResponse'
+
+export const getPayments = async (id: number): Promise<PaymentResponse> => {
+  const response = await axios.get('/me/payments/' + id)
+  return response.data
+}
+
+export const createPayment = async (
+  id: number,
+  image: string
+): Promise<PaymentResponse> => {
+  const response = await axios.post('/me/payments/' + id, { image })
+  return response.data
+}
+```
