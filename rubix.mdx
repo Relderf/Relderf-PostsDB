@@ -1,0 +1,23 @@
+---
+title: 'Bank appointments system'
+date: '2023-07-18'
+tags: ['ruby', 'rails', 'rubyOnRails', 'w3c', 'validations', 'mysql', ]
+---
+
+In this project I built a system to manage appointments in a bank. The system has a login and registration section, 
+and it allows users to create appointments, and to see the appointments they have created. 
+The system also allows *manager* accounts to see the appointments created by other users and operate on them.
+Besides the expected CRUD operations available, managers can *fulfil* appointments, which means that they can
+mark them as completed, and leave a comment on them.
+
+These managening accounts are assigned a department number, so they are restricted to see and operate on appointments
+created by users that belong to the same department only.
+
+Admin accounts are in charge of creating both types of accounts, and can see all the appointments created by all users, 
+but cannot operate on them.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/rubix.png" alt="Rubix bank app" />
+
+The system has validations in place to ensure that the data entered by the users is valid, and that the appointments
+are created in the future, and not in the past. 
+This validations are both applied on the client side as on the database side.
