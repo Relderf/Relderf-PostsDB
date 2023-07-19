@@ -1,0 +1,100 @@
+---
+title: 'Vacunatory appointments app'
+date: '2023-07-19'
+tags: ['javascript', 'typescript', 'angular', 'material', 'nodejs', 'node', 'css3', 'html5', 'bootstrap', 'git', 'gitHub']
+---
+
+The Vacunassist project is a web application that allows the user to register and schedule a vaccination appointment. 
+The application is developed in Angular and uses a MongoDB database. The backend is developed in NodeJS and Express.
+This is was of my first group projects and it was developed -in a team of three-, so it might present some unorthodox ways
+of dealing with issues.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/vacunassist.png" alt="Vaccunasist active appointments" />
+
+# Backend
+
+The backend logic of the app includes the basic CRUD operations for users, appointments and news. 
+The users are stored in a MongoDB database and the passwords are encrypted using rsa 4096 under the node:crypto module.
+Based on a roles system, users may be able to access and see different parts of the app. The admin role works as a super admin
+and all functions are available to it, including the ability to post pieces of news to the app, for all users to see.
+
+```javascript
+const ARTICLE = require('../models/ARTICLE')
+
+exports.uploadArticle = (req, res, next) => {
+  ARTICLE.findOne({ title: req.body.title })
+    .then((article) => {
+      if (!article) {
+        const NEW_ARTICLE = new ARTICLE({
+          title: req.body.title.trim(),
+          img: req.body.img,
+          body: req.body.body.trim(),
+        })
+        NEW_ARTICLE
+          .save()
+          .then((article) => {
+            res
+              .status(200)
+              .json({ success: true, msg: 'imagen guardada', article: article })
+          })
+          .catch((err) => {
+            next(err)
+          })
+      } else
+        res.status(409).json({ success: false, msg: 'titulo ya existente' })
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err, msg: 'unknown error' })
+    })
+}
+```
+
+For the frontend, the app present a full angular material design, with a custom theme matching the logotype colors, 
+and custom components. The overall design includes card elements, datepickers, grids, dialogs, menues, snackbars, tables
+and more. 
+
+```html
+</app-navigation-header>
+<div class="contenedor">
+  <h4 class="categoria" style="font-size: 30px; color: white">
+    Confirmar turno
+  </h4>
+  <mat-card class="seccion">
+    <div class="titulo">
+      Elegí fecha para el turno:
+    </div>
+    <mat-card-content class="cuerpo" style="font-size: 16px">
+      <mat-grid-list cols="3" rowHeight="fit" style="height: 440px">
+        [...]
+        <mat-grid-tile [colspan]="2" [rowspan]="2">
+          <mat-form-field class="formulario-ancho" appearance="fill">
+            <input matInput [matDatepicker]="picker" name="fecha" [formControl]="user.fecha" [min]="minDate" required="false"/>
+            <mat-hint>DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker startView="month" [startAt]="startDate" ></mat-datepicker>
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <h3>Riesgo:</h3>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1">
+          <span *ngIf="user.riesgo">
+            <p style="color: rgb(219, 90, 86)"><b>Sí</b></p>
+          </span>
+          <span *ngIf="!user.riesgo">
+            <p style="color:rgb(79, 216, 79)"><b>No</b></p>
+          </span>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </mat-card-content>
+    <mat-card-actions class="opciones">
+      <button mat-raised-button class="botonConfirmar" (click)="confirmarTurno()">
+        Confirmar
+      </button>
+      <button mat-raised-button class="botonRegresar" routerLink="/AdministrarTurnos">
+        Regresar
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+```
