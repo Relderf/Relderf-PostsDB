@@ -1,0 +1,92 @@
+---
+title: 'Mempy memory cards game'
+date: '2023-07-19'
+tags: ['python', 'pysimplegui', 'matplotlib', 'pandas', 'game']
+---
+
+The Mempy project was my first Python big challenge. It is a desktop app featuring a kids board game,
+in an attempt to help them improve their memory skills while showing them what can be done with this 
+versatil language. The whole deal is coded in python and nothing else.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mempy_gameplay.png" alt="Mempy match example" />
+
+```python
+def _create_game_board(self):
+        """ Through different calls, builds the
+        central part of a match, which is the
+        board, the quadrilateral where the tokens
+        are stored. It builds a matrix of objects
+        of class Token that is returned for its
+        implementation in the window """
+        game_board = []
+        self._choose_tokens()
+        tokens_number = (self._groups_ * self._matchings)
+        while (len(self._tokens_list) < tokens_number):
+            name = sample(self._chosen, 1)
+            if self._check_pairs(name):
+                self._tokens_list.append(name[0])
+        col = self._columns
+        y, x = 0, 0
+        ID = 0
+        if self._token_type == 'Words':
+            color = self._tokens_info['background']
+            while len(self._tokens_list) > 0:
+                token = WordToken(self._tokens_list.pop(0), ID, color,
+                                            key=(y, x), 
+                                            button_color=('Black', 'Black'),
+                                            border_width=3,
+                                            size=(10,5))
+                game_board.append(token)
+                ID += 1
+                x += 1
+                if x >= col:
+                    x = 0
+                    y += 1
+        else:                   #Images
+            [...]
+        return game_board
+```
+
+The game is based on the classic memory cards game, where the player has to find 
+the matching pairs of cards. The game is implemented using the PySimpleGUI library, the data
+analysis is done with Pandas and Matplotlib, and stored in local JSON files.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mempy_statistics.png" alt="Mempy statistics section" />
+
+```python
+    def show_graph(plt, data):
+        """ This method receives the data to be graphed, 
+        and generates a pie chart """
+
+        mempy_data = getPandasData()
+        filtering_field = data['filtering_field']
+        grouping_field = data['grouping_field']
+        dataFilter = data['filter'] if 'filter' in data.keys() else 'no data'
+
+        if not filtering_field:
+            attempts = mempy_data[mempy_data["event_name"]=="attempt"]
+            correctAttempts = attempts[mempy_data["state"]=="correct"]
+            listOfAttempts = [ list((data.head(1)["word"]))[0] for _match_,data in correctAttempts.groupby(["game"])]
+            result = cs(listOfAttempts).most_common(10)
+            tags = list(map(lambda x:x[0],result))
+            data = list(map(lambda x:x[1],result))
+            explode = [0]*len(tags)
+        else:
+            data = (data_mempy[data_mempy[filtering_field] != dataFilter]
+                .groupby([grouping_field])[grouping_field]
+                .count()
+                )
+            explode = [0]*len(data.values)
+            tags = data.keys()
+        
+        plt.pie(data, explode=explode, labels=tags,
+                autopct='%1.2f%%', shadow=True, startangle=90, labeldistance=1.1)
+        plt.axis('equal')
+        plt.legend(bbox_to_anchor=(0.85, 0.15), loc='upper left')
+```
+
+It counts with a main menu, where the user can choose to start the game, change the configurations, 
+see a score board, some statistics about the played matches, and a begginers guide, included in the configs. 
+The game offers different difficulties some series of levels that the player has to complete to win the game.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mempy_config.png" alt="Mempy config section" />
