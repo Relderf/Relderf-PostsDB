@@ -14,7 +14,7 @@ of dealing with issues.
 # Backend
 
 The backend logic of the app includes the basic CRUD operations for users, appointments and news. 
-The users are stored in a MongoDB database and the passwords are encrypted using rsa 4096 under the node:crypto module.
+The users are stored in a MongoDB database and the passwords are encrypted using RS256.
 Based on a roles system, users may be able to access and see different parts of the app. The admin role works as a super admin
 and all functions are available to it, including the ability to post pieces of news to the app, for all users to see.
 
