@@ -1,0 +1,95 @@
+---
+title: 'Image merger and classifier'
+date: '2023-07-19'
+tags: ['python', 'pysimplegui', 'pil', 'csv', 'json']
+---
+
+This desktop app was made for a private project, so it cannot be found on my github repository.
+Instead, I took some pieces of code as examples of its logic.
+It was made with the purpose of creating semi-random signatures, from which addon images were
+merge to create a concrete sole image. Then, those images were exposed to be classified by hand.
+Finally, a series of attributes, like a text, name and such, were assigned to those filtered.
+It does not imply a lot of complex logic, but a lot of things are taken into account to make 
+it work, so the code became quite long.
+
+# *Token* section's event manager
+
+After setting a number of signatures to be created and letting the app do its job, the user
+can enter this Tinder-like section, where the images are shown and the user can swipe left or right.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mixer10k_token.png" alt="Image mixer selector" />
+
+```python
+while True:
+    if len(list(rawSignatures.keys())) > 0:
+        nextKey = list(rawSignatures.keys())[-1]
+    else:
+        nextKey = None
+    if nextKey != None:
+        nextImgPath = os.path.join(pathTokensSmall, (str(nextKey) + ".png"))
+        window["token"].Update(filename = nextImgPath)
+        window.refresh()
+    else:
+        window["token"].Update(filename = (fileTokenPH))
+        
+    event, values = window.read()
+    if event == sg.WIN_CLOSED:
+        break
+    elif event == "-BACK_BUTTON-" or event in ["a", "A", "Left:37"]:
+        logs = fg.loadJSON(logsFile)
+        if (len(logs) > 0):
+            rawSignatures, discardedSignatures, superLikeSignatures, approvedSignatures = (
+                revert_change(rawSignatures, discardedSignatures, superLikeSignatures, approvedSignatures)
+                )
+    [...]
+    elif  event == '-RETURN-':
+        window.close()
+        main.main()
+        break
+    bajar_firmas(rawSignatures, discardedSignatures, superLikeSignatures, approvedSignatures)
+    acualizarNumeros(window)
+window.close()
+```
+
+# Profiles management
+
+The app was made with PySimpleGUI and it has a very simple interface. It is divided into 
+three big sections: the first one is the image merger, and the second one is the image classifier
+and there's a third part in which the images are assigned properties to form profiles, 
+which can be overviewed. 
+The app is in Spanish, but I will translate the code to English so it can be understood.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mixer10k_hookedin.png" alt="Image mixer profiles displayer" />
+
+Profiles' body texts are obtained through some CSV extraction and loaded into a single dictionary.
+
+```python
+def loadCSVTexts():
+    """ Loads all the phrases' CSVs in a dictionary, downloads 
+    it to a JSON, and returns the dictionary in the process """
+    texts = {}
+    filesNames = list(os.listdir(path_texts))
+    #All CSVs are loaded into a single dictionary
+    for file in filesNames:
+        name = file.split(sep=".")[0]
+        data = open(os.path.join(path_texts, file), "r")
+        csvreader = csv.reader(data, delimiter='|')
+        header = next(csvreader)
+        texts[name] = {}
+        id = 1
+        for i in csvreader:
+            texts[name][str(id)] = {header[0] : str(i[0]),
+                header[1] : str(i[1]),
+            }
+            id += 1
+        data.close()
+    return texts
+```
+
+# Results summary
+
+In addition, a test summary was added in the latest versions to check that no
+addon image was being left aside by mistake, and that occurrency chances where
+being respected.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/mixer10k_summary.png" alt="Image mixer summary" />
