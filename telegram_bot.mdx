@@ -1,0 +1,33 @@
+---
+title: 'Telegram bot'
+date: '2023-07-19'
+tags: ['python', 'telegram', 'bot', 'web scraping', 'scraping', 'json']
+---
+
+Due to its private nature, the code is not available. However, I can show you some of the functions that I used to make it work.
+It's a brute force data scraper that checks the website quite often to see if there's a new chapter available. If so, it sends 
+a message to a Telegram group. And during the lazy perios of time, it sleeps for a different ammount of time depending on
+how soon it will have to start checking again. It's tough, but it fulfills its purpose.
+
+```python
+def await_chapter(url, message, lastNumber):
+    today = checkWeekday()
+    print("Post-chapter verification begins.")
+    while today not in ['wednesday', 'thursday']:
+        notFound(today)
+        sleep(DAY)
+        today = checkWeekday()
+    while today == 'wednesday':
+        notFound(today)
+        sleep(HOURS)
+        today = checkWeekday()
+    while today == 'thursday':
+        print('[' + str(dt.datetime.now().strftime('%H:%M:%S')) + '] Checking...')
+        if get_chapter(url):
+            send_message(message)
+            print('Found ' + str(lastNumber) + ' at ' 
+            + str(dt.datetime.now().strftime('%H:%M:%S.')))
+            break
+        sleep(MINUTES)
+        today = checkWeekday()
+```
