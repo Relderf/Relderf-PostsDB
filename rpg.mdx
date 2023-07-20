@@ -1,0 +1,44 @@
+---
+title: 'RPG Godot playground'
+date: '2023-07-20'
+tags: ['godot4', 'godot', 'scripting', 'rpg', 'game']
+---
+
+This is not a game, but a playground for testing out ideas for a another RPG game.
+It has been working not only as a prototype for a game I am working on, but as
+a way to learn Godot and GDScript.
+It's originally forked from a project by DevWorm.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/rpg.png" alt="RPG Skeleton chase" />
+
+## Skeleton chasing method
+
+```godot
+func detect_player(delta):
+	player = Global.skeleton_player
+	if player != null and alive:
+		if !chasing:
+			activate_exclamation_mark()
+			if surprisable:
+				done_being_surprised = false
+				surprisable = false
+		if done_being_surprised:	
+			chasing = true
+			speed = 30
+			$AnimatedSprite2D.play("walk")
+			destination = player.position - Vector2(0,-9)
+			direction = (player.position - position).normalized()
+			var range = player.position - position
+			var direction: Vector2 = (destination - position).normalized()
+			var movement: Vector2 = direction * speed * delta * 1.5
+			if (range[1] > 0.2 or range[1] < -0.2) or (range[0] > 0.2 or range[0] < -0.2):
+				position += movement
+			set_direction(direction, destination)
+			$AnimatedSprite2D.flip_h = direction.x < 0.5
+	elif chasing and player == null:
+		speed = ORIGINAL_SPEED
+		chasing = false
+		activate_question_mark()
+	if !done_being_surprised:
+		surprise()
+```
