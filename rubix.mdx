@@ -21,3 +21,36 @@ but cannot operate on them.
 The system has validations in place to ensure that the data entered by the users is valid, and that the appointments
 are created in the future, and not in the past. 
 This validations are both applied on the client side as on the database side.
+
+```ruby
+class Appointment < ApplicationRecord
+    def past_date?
+        if self.date < Date.today
+            errors.add(:date, "The date entered cannot be in the past.")
+        end
+    end
+    def valid_date?
+        if !Schedule.exists?(branch_id: self.branch_id, day: self.date.wday)
+            errors.add(:date, "The selected day is not available for this branch.")
+        end
+    end
+    def valid_time?
+        if !self.time.nil?
+            schedule = Schedule.find_by(branch_id: self.branch_id, day: self.date.wday)
+            if schedule && self.id && self.time < schedule.start_time || self.time > schedule.end_time
+                errors.add(:time, "The selected time is not available for this branch.")
+            end
+        end
+    end
+    def check_done
+        if !self.done
+            errors.add(:base, "A completed appointment cannot be deleted.")
+        end
+    end
+    def commentary_presence?
+        if self.done && self.commentary.nil?
+            errors.add(:commentary, "The commentary cannot be empty.")
+        end
+    end
+    [...]
+```
