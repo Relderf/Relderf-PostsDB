@@ -11,7 +11,7 @@ in which many API endpoints were exposed for the public app to use. A **PosgreSQ
 
 <CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/depove.png" alt="CDVE public app" />
 
-# Private app
+### Private app
 
 The private app included a login system with roles and permissions, a user management system, and a whole associates management 
 system for the club (being these ones the public app users, and the point of the whole system).
@@ -49,7 +49,7 @@ def associate_payments(id):
     return response(200, res)
 ```
 
-# Public app
+### Public app
 
 The public app was developed using Vue.js, receiving the information from the private app through the exposed API endpoints. It was possible to send the payment 
 receipts to the Club under a user ID, and also to see what activities the Club offered, and some statistics about the Club evolution, related to its associates.
