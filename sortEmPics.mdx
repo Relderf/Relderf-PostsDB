@@ -1,0 +1,44 @@
+---
+title: 'Images sorter'
+date: '2023-08-04'
+tags: ['python', 'pysimplegui', 'images', 'sorter']
+---
+
+This application was designed and developed under external requirements, 
+and tuned up with what I thought was best for it.
+I have to admit there are some things that could be done better,
+but it works, and it's free.
+
+<CustomImage src="https://raw.githubusercontent.com/Relderf/Relderf-PostsDB/main/images/sortEmPics.png" alt="Image sorting app" />
+
+There are some missing features that I would like to implement in the future,
+but I don't have the time right now.
+
+```python
+def sort_pictures():
+    """ Sorts the pictures in the input folder 
+    into the output folder, according to
+    the user configuration """
+    config = load_config()
+    in_folder_path = config['input_folder']
+    source_items = os.listdir(config['input_folder'])
+    if not config["single_file_folder"]:
+        quantities = get_quantities(in_folder_path, source_items)
+    else:
+        quantities = None
+    
+    for item in source_items:
+        input_file_path = in_folder_path + item
+        metadata = get_file_details(input_file_path)
+        
+        output_folder = config['output_folder']
+        year_folder = metadata['year']
+        month_folder = format_month(config, metadata['month'])
+        day_folder = metadata['day']
+        if not config["single_file_folder"] and quantities[year_folder][metadata['month']][day_folder] < 2:
+            day_folder = None
+        secure_folder(output_folder, year_folder, month_folder, day_folder)
+        move_opt = not config["keep_original"]
+        move_file(move_opt, input_file_path, output_folder, year_folder, month_folder, day_folder, metadata['name'])
+```
+
